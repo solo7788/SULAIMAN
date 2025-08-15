@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta http-equiv="Content-Security-Policy"
-content="default-src 'self'; img-src 'self' blob: data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://cdn.tailwindcss.com 'unsafe-inline'; connect-src 'self' https:; base-uri 'self'; form-action 'self'">
+content="default-src 'self'; img-src 'self' https: blob: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://cdn.tailwindcss.com 'unsafe-inline'; connect-src 'self' https:; base-uri 'self'; form-action 'self'">
 
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -12,44 +12,25 @@ content="default-src 'self'; img-src 'self' blob: data: https:; style-src 'self'
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>const DEV = ['localhost','127.0.0.1'].includes(location.hostname);
-
+  <script>
 /** ----- Safe rendering helpers ----- */
 function setContactBox(el, label, value, hrefPrefix){
   if(!el) return;
   el.replaceChildren();
-
-  const t1 = document.createElement('div');
-  t1.className = 'font-semibold';
-  t1.textContent = label;
-
-  const t2 = document.createElement('div');
-  t2.className = 'text-gray-600 dark:text-gray-400';
-  t2.setAttribute('dir','ltr');
-
-  if (hrefPrefix && value){
-    if (el.tagName === 'A'){
-      el.href = hrefPrefix + value;
-      t2.textContent = value;
-    } else {
-      const a = document.createElement('a');
-      a.href = hrefPrefix + value;
-      a.rel = 'nofollow noopener';
-      a.textContent = value;
-      t2.append(a);
-    }
-  } else {
-    t2.textContent = value || '';
-  }
-
-  el.append(t1, t2);
+  const t1=document.createElement('div'); t1.className='font-semibold'; t1.textContent=label;
+  const t2=document.createElement('div'); t2.className='text-gray-600 dark:text-gray-400'; t2.setAttribute('dir','ltr');
+  if(hrefPrefix && value){
+    if(el.tagName==='A'){ el.href=hrefPrefix+value; t2.textContent=value; }
+    else { const a=document.createElement('a'); a.href=hrefPrefix+value; a.rel='nofollow noopener'; a.textContent=value; t2.append(a); }
+  } else { t2.textContent=value||''; }
+  el.append(t1,t2);
 }
 function fillList(ul, items){
   if(!ul) return;
-  ul.replaceChildren(...(items||[]).map(txt=>{
-    const li=document.createElement('li'); li.textContent=txt; return li;
-  }));
+  ul.replaceChildren(...(items||[]).map(txt=>{ const li=document.createElement('li'); li.textContent=txt; return li; }));
 }
+function $(sel){ return document.querySelector(sel); }
+const DEV = ['localhost','127.0.0.1'].includes(location.hostname);
 tailwind.config={theme:{extend:{fontFamily:{cairo:['Cairo','system-ui','sans-serif'],inter:['Inter','system-ui','sans-serif']},colors:{brand:{600:'#1d4ed8',700:'#1e40af'}}}},darkMode:'class'};</script>
   <style>html{scroll-behavior:smooth} .soft{box-shadow:0 10px 25px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05)} .rounded-2xl{border-radius:1.25rem}</style>
 
@@ -205,8 +186,7 @@ tailwind.config={theme:{extend:{fontFamily:{cairo:['Cairo','system-ui','sans-ser
   </dialog>
 
   <script>
-  function $(sel){ return document.querySelector(sel); }
-const root = document.documentElement;
+  const root = document.documentElement;
   $('#year').textContent = new Date().getFullYear();
 
   // Theme
@@ -508,7 +488,13 @@ async function logVisit(consented){
     });
   }catch(_){ loc = null; }
   try{
-    await fetch(VISITOR_LOG_ENDPOINT, { method: 'POST', mode: 'no-cors', body: JSON.stringify({...base, location: loc}), signal: ctrl.signal, keepalive: true });
+    await fetch(VISITOR_LOG_ENDPOINT, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: JSON.stringify({...base, location: loc}),
+      signal: ctrl.signal,
+      keepalive: true
+    });
   }catch(e){ console.warn('logVisit failed', e); }
   finally{ clearTimeout(timer); }
 }
