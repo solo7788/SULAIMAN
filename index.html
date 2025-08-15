@@ -170,14 +170,37 @@ content="default-src 'self'; img-src 'self' blob: data:; style-src 'self' 'unsaf
 
 /** ----- Safe rendering helpers ----- */
 function $(sel){ return document.querySelector(sel); }
+
 function setContactBox(el, label, value, hrefPrefix){
   if(!el) return;
   el.replaceChildren();
-  const t1=document.createElement('div'); t1.className='font-semibold'; t1.textContent=label;
-  const t2=document.createElement('div'); t2.className='text-gray-600 dark:text-gray-400'; t2.setAttribute('dir','ltr');
-  if(hrefPrefix && value){
-    const a=document.createElement('a'); a.href=hrefPrefix+value; a.rel='nofollow noopener'; a.textContent=value; t2.append(a);
-  } else { t2.textContent=value||''; }
+
+  const t1 = document.createElement('div');
+  t1.className = 'font-semibold';
+  t1.textContent = label;
+
+  const t2 = document.createElement('div');
+  t2.className = 'text-gray-600 dark:text-gray-400';
+  t2.setAttribute('dir','ltr');
+
+  if (hrefPrefix && value){
+    if (el.tagName === 'A'){            // if the host is already a link
+      el.href = hrefPrefix + value;     // put the href on the host element
+      t2.textContent = value;           // just text inside
+    } else {
+      const a = document.createElement('a');
+      a.href = hrefPrefix + value;
+      a.rel = 'nofollow noopener';
+      a.textContent = value;
+      t2.append(a);
+    }
+  } else {
+    t2.textContent = value || '';
+  }
+
+  el.append(t1, t2);
+}
+else { t2.textContent=value||''; }
   el.append(t1,t2);
 }
 function fillList(ul, items){
@@ -203,8 +226,6 @@ function postRenderSafe(cfg, lang){
     }
   }catch(e){ console.warn('postRenderSafe issue:', e); }
 }
-
-  const $ = s => document.querySelector(s);
   const root = document.documentElement;
   $('#year').textContent = new Date().getFullYear();
 
